@@ -1,6 +1,7 @@
 #include <stdio.h>
+#include <stdlib.h>
 
-#define N 10
+#define N 100
 
 typedef char element;
 
@@ -9,13 +10,8 @@ typedef struct {
   element stack[N];
 } StackType;
 
-typedef struct {
-  element queue[N];
-  int front, rear;
-} QueueType;
-
 void initStack(StackType *S) {
-  S -> top = -1;
+  S->top = -1;
 }
 
 int isStackEmpty(StackType *S) {
@@ -43,53 +39,111 @@ element pop(StackType *S) {
   return e;
 }
 
-void initQueue(QueueType *Q) { Q->front = Q->rear = -1; }
-
-int isQueueEmpty(QueueType *Q) { return Q->front == Q->rear; }
-
-int isQueueFull(QueueType *Q) { return Q->rear == N - 1; }
-
-void enqueue(QueueType *Q, element e) {
-  if (isFull(Q))
-    printf("Full\n");
-  else {
-    Q->rear++;
-    Q->queue[Q->rear] = e;
-  }
-}
-
-element dequeue(QueueType *Q) {
-  if (isEmpty(Q)) {
+element peek(StackType *S) {
+  if (isStackEmpty(S)) {
     printf("Empty\n");
     return -1;
   }
-  Q->front++;
-  return Q->queue[Q->front];
+  return S->stack[S->top];
 }
 
-StackType S;
-QueueType Q;
+void printStack(StackType *S) {
+  for (int i = 0; i < S->top; i++)
+    printf("%c ", S->stack[i]);
+  printf("\n");
+}
 
-void convert(char * infix, char * postfix) {
-  for (int i = 0; i < N; i++) {
-    if (infix[i] == '(')
-      push(&S, '(');
-    else if (infix[i] == ')'){
-      char out;
-      while (out != '(') {
-        out = pop(&S);
-        if (out != '(')
-          enqueue(&Q, out);
+int prec(char op) {
+  switch (op) {
+    case '(': case ')':
+      return 0;
+    case '+': case '-':
+      return 1;
+    case '*': case '/':
+      return 2;
+  }
+  return -1;
+}
+
+void convert(char *exp, char *postfix) {
+  char ch, top_op;
+  int len = strlen(exp), index = 0;
+
+  StackType s;
+  initStack(&s);
+
+  for (int i = 0; i < len; i++) {
+    ch = exp[i];
+    switch (ch) {
+      case '+': case '-': case '*': case '/':
+        while (!isStackEmpty(&s) && (prec(ch)) <= prec(peek(&s))) {
+          postfix[index] = pop(&s);
+          index++;
+        }
+        push(&s, ch);
+        break;
+      case '(':
+        push(&s, ch);
+        break;
+      case ')':
+        top_op = pop(&s);
+        while (top_op != '(') {
+          postfix[index] = top_op;
+          index++;
+          top_op = pop(&s);
+        }
+        break;
+      default:
+        postfix[index] = ch;
+        index++;
+        break;
+    }
+  }
+  while (!isStackEmpty(&s)) {
+    postfix[index] = pop(&s);
+    index++;
+  }
+
+  postfix[index] = '\0';
+  // printf("%s\n", postfix);
+}
+
+int evaluate(char *exp) {
+  int op1, op2, value;
+  int len = strlen(exp);
+  char ch;
+
+  StackType s;
+  initStack(&s);
+
+  for (int i = 0; i < len; i++) {
+    ch = exp[i];
+    if (ch != '+' && ch != '-' && ch != '*' && ch != '/') {
+      value = ch - '0';
+      push(&s, value);
+    } else {
+      op2 = pop(&s);
+      op1 = pop(&s);
+      switch (ch) {
+        case '+':
+          push(&s, op1 + op2);
+          break;
+        case '-':
+          push(&s, op1 - op2);
+          break;
+        case '*':
+          push(&s, op1 * op2);
+          break;
+        case '/':
+          push(&s, op1 / op2);
+          break;
       }
     }
   }
+  return pop(&s);
 }
 
-int evaluate(char * postfix) {
-
-}
-
-int main() {
+int main(void) {
   char infix[N], postfix[N];
   scanf("%s", infix);
 
