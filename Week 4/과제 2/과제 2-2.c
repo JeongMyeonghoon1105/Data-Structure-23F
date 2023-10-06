@@ -40,43 +40,38 @@ element pop(StackType *S) {
 }
 
 void printStack(StackType *S) {
-  for (int i = 0; i < S->top; i++)
+  for (int i = 0; i <= S->top; i++)
     printf("%c", S->stack[i]);
   printf("\n");
 }
 
-int palindrome(StackType *S, int len, element *data) {
-  for (int i = 0; i < len / 2; i++)
-    push(&S, data[i]);
-  printStack(&S);
-  
-  for (int i = len / 2 + 1; i < len; i++) {
-    if (data[i] != pop(&S))
-      return 0;
-  }
-  return 1;
-}
-
 int main(void) {
-  StackType S;
-  initStack(&S);
+  StackType s1, s2;
+  initStack(&s1);
+  initStack(&s2);
   element data[N];
 
   gets(data);
   int len = strlen(data), pal = 1;
 
-  for (int i = 0; i <= len / 2; i++) {
+  for (int i = 0; i < len; i++)
     if (data[i] >= 65 && data[i] <= 90) {
       data[i] += 32;
-      push(&S, data[i]);
+      push(&s1, data[i]);
     } else if (data[i] >= 97 && data[i] <= 122)
-      push(&S, data[i]);
-  }
+      push(&s1, data[i]);
   
-  for (int i = len / 2 + 1; i < len; i++)
-    if (data[i] >= 65 && data[i] <= 90 && data[i] >= 97 && data[i] <= 122) {
-      if (data[i] != pop(&S))
-        pal = 0;
+  for (int i = 0; i <= (s1.top) / 2; i++)
+    push(&s2, pop(&s1));
+
+  if (s1.top == s2.top + 1)
+    pop(&s1);
+
+  int iter = s2.top;
+  for (int i = 0; i <= iter; i++)
+    if (pop(&s1) != pop(&s2)) {
+      pal = 0;
+      break;
     }
 
   if (pal)
