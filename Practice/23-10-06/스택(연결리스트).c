@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#define MAX 100
+#define MAX 4
 
 typedef int element;
 
@@ -12,26 +12,37 @@ typedef struct Node {
 typedef struct {
   node start;
   node *top;
-  int n;
 } StackType;
 
 void initStack(StackType *s) {
   s->start.e = NULL;
   s->start.next = NULL;
   s->top = &(s->start);
-  printf("Push: %x\n", s->top);
-  s->n = -1;
+}
+
+int stackSize(StackType *s) {
+  int count = -1;
+  node *travel = &(s->start);
+  while (travel != NULL) {
+    travel = travel->next;
+    count++;
+  }
+  return count;
 }
 
 int isStackEmpty(StackType *s) {
-  return s->n == -1;
+  return &(s->start) == s->top;
 }
 
 int isStackFull(StackType *s) {
-  return s->n == MAX-1;
+  return stackSize(s) >= MAX;
 }
 
 node *push(StackType *s, element elem) {
+  if (isStackFull(s)) {
+    printf("Full\n");
+    return s->top;
+  }
   node *newNode = (node*)malloc(sizeof(node));
   newNode->e = elem;
   newNode->next = NULL;
@@ -39,8 +50,18 @@ node *push(StackType *s, element elem) {
   return newNode;
 }
 
-void pop() {
-
+node *pop(StackType *s) {
+  if (isStackEmpty(s)) {
+    printf("Empty\n");
+    return &(s->start);
+  }
+  node *travel = &(s->start);
+  while (travel->next->next != NULL)
+    travel = travel->next;
+  printf("Pop: %d\n", travel->next->e);
+  travel->next = NULL;
+  // free(travel->next);
+  return travel;
 }
 
 element peekStack(StackType *s) {
@@ -49,6 +70,7 @@ element peekStack(StackType *s) {
 
 void printStack(StackType *s) {
   node *travel = s->start.next;
+  printf("Stack: ");
   while (travel != NULL) {
     printf("%d ", travel->e);
     travel = travel->next;

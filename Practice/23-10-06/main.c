@@ -11,8 +11,13 @@ int main() {
   for (int i = 0; i < 5; i++) {
     num = rand() % 10;
     s.top = push(&s, num);
+    printStack(&s);
   }
-  printStack(&s);
+
+  for (int i = 0; i < 7; i++) {
+    s.top = pop(&s);
+    printStack(&s);
+  }
 
   return 0;
 }
