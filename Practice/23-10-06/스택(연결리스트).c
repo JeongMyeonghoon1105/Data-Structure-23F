@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#define MAX 4
+#define MAX 50
 
 typedef int element;
 
