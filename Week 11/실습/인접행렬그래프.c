@@ -105,7 +105,13 @@ void insertEdge(GraphType *G, int u, int v) {
 }
 
 void print(GraphType *G) {
+  printf("\t");
+  for (int i = 1; i <= G->n; i++)
+    printf("%d번\t", i);
+  printf("\n");
+
   for (int i = 1; i <= G->n; i++) {
+    printf("%d번\t", i);
     for (int j = 1; j <= G->n; j++)
       printf("%d\t", G->adjMat[i][j]);
     printf("\n");
@@ -121,6 +127,7 @@ void rDFS(GraphType *G, int s) {
       rDFS(G, t);
 }
 
+/*
 void DFS(GraphType *G, int s) {
   StackType S;
   initStack(&S);
@@ -142,6 +149,7 @@ void DFS(GraphType *G, int s) {
     }
   }
 }
+*/
 
 void BFS(GraphType *G, int s) {
   QueueType Q;
@@ -167,7 +175,9 @@ int main() {
   initGraph(&G);
 
   // 정점 개수 입력
+  printf("정점 개수 : ");
   int n; scanf("%d", &n);
+  printf("\n");
 
   // 정점 생성
   for (int i = 0; i < n; i++)
@@ -184,8 +194,7 @@ int main() {
 
   // 깊이 우선 탐색
   printf("\nDFS: ");
-  // rDFS(&G, 4);
-  DFS(&G, 4);
+  rDFS(&G, 4);
 
   // 방문 기록 스택 초기화
   for (int i = 0; i < N; i++)
@@ -194,6 +203,7 @@ int main() {
   // 너비 우선 탐색
   printf("\nBFS: ");
   BFS(&G, 4);
+  printf("\n");
   
   return 0;
 }
