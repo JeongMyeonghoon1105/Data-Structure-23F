@@ -1,11 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <limits.h>
 
 #define N 10
 #define true 1
 #define false 0
-#define INF	INT_MAX
 
 int visited[N] = {false};
 
@@ -28,9 +26,6 @@ typedef struct {
   int n;
   int adjMat[N][N];
 } GraphType;
-
-int distance[N];
-int visited[N];
 
 // Functions for stack
 void initStack(StackType *S) {
