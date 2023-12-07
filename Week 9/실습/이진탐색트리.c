@@ -57,10 +57,6 @@ int recursiveNodeCount(TreeNode *root) {
   return 1 + recursiveNodeCount(root->left) + recursiveNodeCount(root->right);
 }
 
-int iterativeNodeCount(TreeNode *root) {
-  return 0;
-}
-
 int getHeight(TreeNode *root) {
   if (root == NULL)
     return 0;
