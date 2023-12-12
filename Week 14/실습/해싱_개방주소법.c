@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// 해시 테이블의 크기는 주로 소수
 #define M 13
 
 // Bucket
@@ -26,6 +27,7 @@ int h(int key) {
   return key % M;
 }
 
+// Hash Function
 int h2(int key) {
   return 11 - (key % 11);
 }
@@ -35,17 +37,17 @@ int isEmpty(HashTable *HT, int b) {
 }
 
 // 선형 조사
-int getNextBacketLinear(int v, int inc) {
+int getNextBucketLinear(int v, int inc) {
   return (v + inc) % M;
 }
 
 // 이차 조사
-int getNextBacketQuadratic(int v, int inc) {
+int getNextBucketQuadratic(int v, int inc) {
   return (v + inc * inc) % M;
 }
 
 // 이중 해싱
-int getNextBacketDouble(int v, int inc, int key) {
+int getNextBucketDouble(int v, int inc, int key) {
   return (v + inc * h2(key)) % M;
 }
 
@@ -54,11 +56,12 @@ void insertItem(HashTable *HT, int key) {
   int inc = 0;
   int count = 0;
 
+  // 한바퀴 돌 동안 빈 버킷을 찾지 못하고 제자리로 돌아오면 반복 탈출
   while (inc < M) {
     count++;
-    int b = getNextBacketLinear(v, inc);
-    // int b = getNextBacketQuadratic(v, inc);
-    // int b = getNextBacketDouble(v, inc, key);
+    int b = getNextBucketLinear(v, inc);
+    // int b = getNextBucketQuadratic(v, inc);
+    // int b = getNextBucketDouble(v, inc, key);
     
     if (isEmpty(HT, b)) {
       HT->B[b].key = key;
@@ -77,9 +80,9 @@ void deleteItem(HashTable *HT, int key) {
 
   while (inc < M) {
     count++;
-    int b = getNextBacketLinear(v, inc);
+    int b = getNextBucketLinear(v, inc);
 
-    if (isEmpty(HT, b)) {
+    if (HT->B[b].key == key) {
       HT->B[b].key = -1;
       HT->B[b].probeCount = 0;
       return;
@@ -93,7 +96,7 @@ int searchItem(HashTable *HT, int key) {
   int inc = 0;
 
   while (inc < M) {
-    int b = getNextBacketLinear(v, inc);
+    int b = getNextBucketLinear(v, inc);
     
     if (isEmpty(HT, b))
       return 0;
@@ -104,12 +107,14 @@ int searchItem(HashTable *HT, int key) {
   }
 }
 
+// 해시 테이블 출력
 void print(HashTable *HT) {
   for (int i = 0; i < M; i++)
     printf(" %2d", HT->B[i].key);
   printf("\n");
 }
 
+// 각 버킷에 저장된 키 값과, 버킷 결정에 소요된 빈 버킷 탐색 횟수를 표로 출력
 void printHash(HashTable *HT) {
   printf("\nBucket   Key Probe\n");
   printf("==================\n");
@@ -129,6 +134,7 @@ int main(void) {
   printf("=========  ======================================\n");
 
   for (int i = 0; i < 10; i++) {
+    // 키와 그 해시 주소값 출력
     printf("h(%02d): %2d ", data[i], h(data[i]));
     insertItem(&HT, data[i]);
     print(&HT);
@@ -137,43 +143,22 @@ int main(void) {
   printHash(&HT);
 
   int key;
-  printf("Input Search Key: ");
-  scanf("%d", &key);
 
-  if (searchItem(&HT, key)) {
-    printf("Found Key: %d\n", key);
-  } else {
-    printf("Key Not Found\n");
-  }
+  for (int i = 0; i < 3; i++) {
+    // Search
+    printf("Input Search Key: ");
+    scanf("%d", &key);
+    if (searchItem(&HT, key))
+      printf("Found Key: %d\n", key);
+    else
+      printf("Key Not Found\n");
+    
+    // Delete
+    printf("Input Delete Key: ");
+    scanf("%d", &key);
 
-  printf("Input Delete Key: ");
-  scanf("%d", &key);
-
-  deleteItem(&HT, key);
-  printHash(&HT);
-
-  printf("Input Search Key: ");
-  scanf("%d", &key);
-
-  if (searchItem(&HT, key)) {
-    printf("Found Key: %d\n", key);
-  } else {
-    printf("Key Not Found\n");
-  }
-
-  printf("Input Delete Key: ");
-  scanf("%d", &key);
-
-  deleteItem(&HT, key);
-  printHash(&HT);
-
-  printf("Input Search Key: ");
-  scanf("%d", &key);
-
-  if (searchItem(&HT, key)) {
-    printf("Found Key: %d\n", key);
-  } else {
-    printf("Key Not Found\n");
+    deleteItem(&HT, key);
+    printHash(&HT);
   }
   
   return 0;
